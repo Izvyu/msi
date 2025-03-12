@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIS部門管理系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 300ms, transform 300ms;
+        }
+        .task-item:hover {
+            transform: translateX(5px);
+            transition: transform 0.2s;
+        }
+        .calendar-day:hover {
+            transform: scale(1.02);
+            transition: transform 0.2s;
+        }
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex">
+        <!-- 側邊欄 -->
+        <div class="h-screen w-64 bg-gray-800 text-white fixed left-0 top-0">
+            <div class="p-4">
+                <h1 class="text-xl font-bold mb-8">MIS部門管理系統</h1>
+                <nav>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#home" class="flex items-center p-2 rounded-lg hover:bg-gray-700 transition-colors">
+                                <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                                <span>回首頁</span>
+                            </a>
+                        </li>
+                        <li class="my-4 border-t border-gray-700"></li>
+                        <li>
+                            <a href="#budget" class="flex items-center p-2 rounded-lg hover:bg-gray-700 transition-colors">
+                                <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>預算管理</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#activities" class="flex items-center p-2 rounded-lg hover:bg-gray-700 transition-colors">
+                                <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                <span>部門活動</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#todos" class="flex items-center p-2 rounded-lg hover:bg-gray-700 transition-colors">
+                                <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                                <span>待辦事項</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#calendar" class="flex items-center p-2 rounded-lg hover:bg-gray-700 transition-colors">
+                                <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>行事曆</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#logout" class="flex items-center p-2 rounded-lg hover:bg-gray-700 transition-colors">
+                                <svg class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                <span>登出</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 主要內容區域 -->
+        <div class="flex-1 ml-64">
+            <!-- 首頁 -->
+            <div id="home" class="p-8">
+                <h1 class="text-2xl font-bold mb-6">歡迎使用管理系統</h1>
+                <!-- 今日代辦事項 -->
+                <div class="mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-tasks mr-2 text-blue-500"></i>
+                            待辦事項
+                        </h2>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" class="w-5 h-5">
+                                    <div>
+                                        <span class="font-medium">完成專案提案文件</span>
+                                        <span class="ml-2 text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">高優先級</span>
+                                    </div>
+                                </div>
+                                <span class="text-red-500 text-sm">今日截止</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" class="w-5 h-5">
+                                    <div>
+                                        <span class="font-medium">準備週會報告</span>
+                                        <span class="ml-2 text-xs px-2 py-1 bg-orange-100 text-orange-800 rounded-full">中優先級</span>
+                                    </div>
+                                </div>
+                                <span class="text-orange-500 text-sm">14:00 前</span>
+                            </div>
+                            <a href="#todos" class="block text-center text-blue-500 hover:text-blue-600 mt-4">
+                                查看所有待辦事項 <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 今日重要行程 -->
+                <div class="mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-calendar-day mr-2 text-green-500"></i>
+                            重要行程
+                        </h2>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-4 p-3 bg-blue-50 rounded-lg">
+                                <div class="w-16 text-center">
+                                    <div class="text-lg font-bold text-blue-600">10:00</div>
+                                    <div class="text-sm text-blue-500">-</div>
+                                    <div class="text-lg font-bold text-blue-600">11:30</div>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-medium">部門週會</h3>
+                                    <p class="text-sm text-gray-600">地點：會議室 A</p>
+                                    <p class="text-sm text-gray-600">參與人數：15人</p>
+                                </div>
+                                <div class="text-blue-500">
+                                    <i class="fas fa-video"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 p-3 bg-purple-50 rounded-lg">
+                                <div class="w-16 text-center">
+                                    <div class="text-lg font-bold text-purple-600">14:30</div>
+                                    <div class="text-sm text-purple-500">-</div>
+                                    <div class="text-lg font-bold text-purple-600">16:00</div>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-medium">專案進度報告</h3>
+                                    <p class="text-sm text-gray-600">地點：線上會議</p>
+                                    <p class="text-sm text-gray-600">主持人：王經理</p>
+                                </div>
+                                <div class="text-purple-500">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                            <a href="#calendar" class="block text-center text-blue-500 hover:text-blue-600 mt-4">
+                                查看完整行事曆 <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold mb-4">系統概況</h2>
+                        <div class="space-y-2">
+                            <p class="text-gray-600">待辦事項：5 個</p>
+                            <p class="text-gray-600">即將到來的活動：2 個</p>
+                            <p class="text-gray-600">本月預算使用率：45%</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold mb-4">近期活動</h2>
+                        <div class="space-y-2">
+                            <p class="text-blue-600">部門年度聚餐 (3/15)</p>
+                            <p class="text-green-600">團隊建立工作坊 (3/20)</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-lg font-semibold mb-4">系統公告</h2>
+                        <div class="space-y-2">
+                            <p class="text-gray-600">系統將於本週六進行維護更新</p>
+                            <p class="text-gray-600">請記得定期更改密碼</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 預算管理 -->
+            <div id="budget" class="hidden p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold">預算管理</h1>
+                    <div class="flex gap-4">
+                        <button class="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                            <i class="fas fa-file-export mr-2"></i>
+                            匯出報表
+                        </button>
+                        <button class="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                            <i class="fas fa-plus mr-2"></i>
+                            新增預算項目
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-lg font-semibold mb-4">預算使用趨勢</h2>
+                            <canvas id="budgetChart" height="200"></canvas>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-lg font-semibold mb-4">本月預算概況</h2>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                                    <div>
+                                        <p class="text-sm text-gray-600">總預算</p>
+                                        <p class="text-xl font-bold text-gray-800">NT$ 1,000,000</p>
+                                    </div>
+                                    <i class="fas fa-money-bill-wave text-2xl text-green-500"></i>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                                    <div>
+                                        <p class="text-sm text-gray-600">已使用</p>
+                                        <p class="text-xl font-bold text-gray-800">NT$ 450,000</p>
+                                    </div>
+                                    <i class="fas fa-chart-pie text-2xl text-blue-500"></i>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                                    <div>
+                                        <p class="text-sm text-gray-600">剩餘</p>
+                                        <p class="text-xl font-bold text-gray-800">NT$ 550,000</p>
+                                    </div>
+                                    <i class="fas fa-wallet text-2xl text-yellow-500"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold">預算使用明細</h2>
+                                <div class="flex gap-2">
+                                    <select class="px-3 py-2 border rounded-lg">
+                                        <option>全部類別</option>
+                                        <option>人事費用</option>
+                                        <option>設備支出</option>
+                                        <option>營運成本</option>
+                                    </select>
+                                    <input type="month" class="px-3 py-2 border rounded-lg" />
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr class="bg-gray-50">
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">日期</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">項目</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">類別</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">金額</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">狀態</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4">2024/03/01</td>
+                                            <td class="px-6 py-4">員工薪資</td>
+                                            <td class="px-6 py-4">人事費用</td>
+                                            <td class="px-6 py-4">NT$ 300,000</td>
+                                            <td class="px-6 py-4"><span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已核准</span></td>
+                                        </tr>
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4">2024/03/05</td>
+                                            <td class="px-6 py-4">辦公設備更新</td>
+                                            <td class="px-6 py-4">設備支出</td>
+                                            <td class="px-6 py-4">NT$ 150,000</td>
+                                            <td class="px-6 py-4"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">待審核</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-4 flex justify-between items-center">
+                                <div class="text-sm text-gray-500">顯示 1 至 2 筆，共 2 筆</div>
+                                <div class="flex gap-2">
+                                    <button class="px-3 py-1 border rounded-lg hover:bg-gray-50">上一頁</button>
+                                    <button class="px-3 py-1 border rounded-lg hover:bg-gray-50">下一頁</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 部門活動 -->
+            <div id="activities" class="hidden p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold">部門活動</h1>
+                    <button class="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                        <i class="fas fa-plus mr-2"></i>
+                        建立新活動
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                                <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
+                                即將舉行的活動
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="border-l-4 border-blue-500 pl-4 p-4 bg-blue-50 rounded-r-lg hover:shadow-md transition-shadow">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-medium text-lg">部門年度聚餐</h3>
+                                            <div class="mt-2 space-y-1">
+                                                <p class="text-gray-600 flex items-center">
+                                                    <i class="fas fa-clock mr-2"></i>
+                                                    2024/03/15 18:00-21:00
+                                                </p>
+                                                <p class="text-gray-600 flex items-center">
+                                                    <i class="fas fa-map-marker-alt mr-2"></i>
+                                                    福華大飯店
+                                                </p>
+                                                <p class="text-gray-600 flex items-center">
+                                                    <i class="fas fa-users mr-2"></i>
+                                                    已報名人數：15/30
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col items-end">
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">報名中</span>
+                                            <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center">
+                                                <i class="fas fa-user-plus mr-2"></i>
+                                                報名參加
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="border-l-4 border-green-500 pl-4 p-4 bg-green-50 rounded-r-lg hover:shadow-md transition-shadow">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-medium text-lg">團隊建立工作坊</h3>
+                                            <div class="mt-2 space-y-1">
+                                                <p class="text-gray-600 flex items-center">
+                                                    <i class="fas fa-clock mr-2"></i>
+                                                    2024/03/20 14:00-17:00
+                                                </p>
+                                                <p class="text-gray-600 flex items-center">
+                                                    <i class="fas fa-map-marker-alt mr-2"></i>
+                                                    會議室 A
+                                                </p>
+                                                <p class="text-gray-600 flex items-center">
+                                                    <i class="fas fa-users mr-2"></i>
+                                                    已報名人數：8/20
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col items-end">
+                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">報名中</span>
+                                            <button class="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center">
+                                                <i class="fas fa-user-plus mr-2"></i>
+                                                報名參加
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                                <i class="fas fa-history mr-2 text-gray-500"></i>
+                                歷史活動記錄
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-gray-50 rounded-lg">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-medium">新年團拜</h3>
+                                            <p class="text-sm text-gray-600">2024/02/15</p>
+                                            <p class="text-sm text-gray-600">參與人數：45人</p>
+                                        </div>
+                                        <div class="flex flex-col items-end">
+                                            <span class="text-gray-500 text-sm">已結束</span>
+                                            <button class="mt-2 text-blue-500 hover:text-blue-600 text-sm">
+                                                查看照片
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 bg-gray-50 rounded-lg">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-medium">部門運動會</h3>
+                                            <p class="text-sm text-gray-600">2024/01/20</p>
+                                            <p class="text-sm text-gray-600">參與人數：38人</p>
+                                        </div>
+                                        <div class="flex flex-col items-end">
+                                            <span class="text-gray-500 text-sm">已結束</span>
+                                            <button class="mt-2 text-blue-500 hover:text-blue-600 text-sm">
+                                                查看照片
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="mt-4 w-full text-gray-600 hover:text-gray-800 text-sm flex items-center justify-center">
+                                <i class="fas fa-chevron-down mr-1"></i>
+                                顯示更多
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 代辦事項 -->
+            <div id="todos" class="hidden p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold">待辦事項</h1>
+                    <div class="flex gap-2">
+                        <select class="px-3 py-2 border rounded-lg">
+                            <option>全部狀態</option>
+                            <option>待處理</option>
+                            <option>進行中</option>
+                            <option>已完成</option>
+                        </select>
+                        <select class="px-3 py-2 border rounded-lg">
+                            <option>全部優先級</option>
+                            <option>高</option>
+                            <option>中</option>
+                            <option>低</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div class="lg:col-span-3">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="mb-6">
+                                <div class="flex gap-4">
+                                    <input
+                                        type="text"
+                                        placeholder="新增代辦事項..."
+                                        class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    <button class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 flex items-center">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        新增
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-4 bg-red-50 rounded-lg task-item">
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" class="w-5 h-5" />
+                                        <div>
+                                            <span class="font-medium">完成專案提案文件</span>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">高優先級</span>
+                                                <span class="text-xs text-gray-500">指派給：王小明</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-red-500 text-sm">截止日期：2024/03/10</span>
+                                        <div class="flex gap-2">
+                                            <button class="text-gray-500 hover:text-blue-500">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-red-500">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-4 bg-orange-50 rounded-lg task-item">
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" class="w-5 h-5" />
+                                        <div>
+                                            <span class="font-medium">準備週會報告</span>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="text-xs px-2 py-1 bg-orange-100 text-orange-800 rounded-full">中優先級</span>
+                                                <span class="text-xs text-gray-500">指派給：李小華</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-orange-500 text-sm">截止日期：2024/03/12</span>
+                                        <div class="flex gap-2">
+                                            <button class="text-gray-500 hover:text-blue-500">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-gray-500 hover:text-red-500">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg task-item opacity-50">
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" class="w-5 h-5" checked />
+                                        <div>
+                                            <span class="font-medium line-through text-gray-500">更新部門預算表</span>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <span class="text-xs px-2 py-1 bg-gray-200 text-gray-800 rounded-full">已完成</span>
+                                                <span class="text-xs text-gray-500">完成者：張小美</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-gray-500 text-sm">完成時間：2024/03/08</span>
+                                        <div class="flex gap-2">
+                                            <button class="text-gray-400">
+                                                <i class="fas fa-check-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-lg font-semibold mb-4">任務統計</h2>
+                            <div class="space-y-4">
+                                <div class="p-3 bg-gray-50 rounded-lg">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">總任務數</span>
+                                        <span class="font-bold">12</span>
+                                    </div>
+                                    <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                                        <div class="h-2 bg-blue-500 rounded-full" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-green-50 rounded-lg">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-green-600">已完成</span>
+                                        <span class="font-bold text-green-600">5</span>
+                                    </div>
+                                    <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                                        <div class="h-2 bg-green-500 rounded-full" style="width: 42%"></div>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-yellow-50 rounded-lg">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-yellow-600">進行中</span>
+                                        <span class="font-bold text-yellow-600">4</span>
+                                    </div>
+                                    <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                                        <div class="h-2 bg-yellow-500 rounded-full" style="width: 33%"></div>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-red-50 rounded-lg">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-red-600">待處理</span>
+                                        <span class="font-bold text-red-600">3</span>
+                                    </div>
+                                    <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                                        <div class="h-2 bg-red-500 rounded-full" style="width: 25%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 行事曆 -->
+            <div id="calendar" class="hidden p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold">行事曆</h1>
+                    <div class="flex gap-4">
+                        <div class="flex items-center gap-2">
+                            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="text-lg font-medium">2024 年 3 月</span>
+                            <button class="p-2 hover:bg-gray-100 rounded-lg">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <button class="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                            <i class="fas fa-plus mr-2"></i>
+                            新增事件
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow">
+                    <div class="grid grid-cols-7 border-b">
+                        <div class="px-4 py-3 text-center font-semibold text-gray-600 border-r">日</div>
+                        <div class="px-4 py-3 text-center font-semibold text-gray-600 border-r">一</div>
+                        <div class="px-4 py-3 text-center font-semibold text-gray-600 border-r">二</div>
+                        <div class="px-4 py-3 text-center font-semibold text-gray-600 border-r">三</div>
+                        <div class="px-4 py-3 text-center font-semibold text-gray-600 border-r">四</div>
+                        <div class="px-4 py-3 text-center font-semibold text-gray-600 border-r">五</div>
+                        <div class="px-4 py-3 text-center font-semibold text-gray-600">六</div>
+                    </div>
+                    <div class="grid grid-cols-7" id="calendar-days"></div>
+                </div>
+
+                <!-- 右側事件列表 -->
+                <div class="mt-6 bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fas fa-list-ul mr-2 text-blue-500"></i>
+                        本月重要事件
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 p-3 bg-blue-50 rounded-lg">
+                            <div class="w-16 h-16 bg-blue-100 rounded-lg flex flex-col items-center justify-center">
+                                <span class="text-sm text-blue-600">3月</span>
+                                <span class="text-xl font-bold text-blue-600">5</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-medium">部門會議</h3>
+                                <p class="text-sm text-gray-600">時間：14:00-16:00</p>
+                                <p class="text-sm text-gray-600">地點：會議室 B</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="text-gray-500 hover:text-blue-500">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-red-500">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 p-3 bg-green-50 rounded-lg">
+                            <div class="w-16 h-16 bg-green-100 rounded-lg flex flex-col items-center justify-center">
+                                <span class="text-sm text-green-600">3月</span>
+                                <span class="text-xl font-bold text-green-600">12</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-medium">客戶拜訪</h3>
+                                <p class="text-sm text-gray-600">時間：10:00-12:00</p>
+                                <p class="text-sm text-gray-600">地點：台北總部</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="text-gray-500 hover:text-blue-500">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-red-500">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 p-3 bg-purple-50 rounded-lg">
+                            <div class="w-16 h-16 bg-purple-100 rounded-lg flex flex-col items-center justify-center">
+                                <span class="text-sm text-purple-600">3月</span>
+                                <span class="text-xl font-bold text-purple-600">15</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-medium">專案討論</h3>
+                                <p class="text-sm text-gray-600">時間：15:00-17:00</p>
+                                <p class="text-sm text-gray-600">地點：會議室 A</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="text-gray-500 hover:text-blue-500">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-red-500">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 登出 -->
+            <div id="logout" class="hidden min-h-screen flex items-center justify-center">
+                <div class="bg-white p-8 rounded-lg shadow-md text-center">
+                    <h1 class="text-2xl font-bold mb-4">登出系統</h1>
+                    <p class="text-gray-600 mb-6">您確定要登出系統嗎？</p>
+                    <div class="space-x-4">
+                        <button class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600">
+                            確認登出
+                        </button>
+                        <button class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                            取消
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 處理導航
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                
+                // 隱藏所有頁面
+                document.querySelectorAll('#home, #budget, #activities, #todos, #calendar, #logout').forEach(page => {
+                    page.classList.add('hidden');
+                });
+                
+                // 顯示目標頁面
+                if (targetId === 'home') {
+                    document.getElementById('home').classList.remove('hidden');
+                } else {
+                    document.getElementById(targetId).classList.remove('hidden');
+                }
+
+                // 如果是預算頁面，初始化圖表
+                if (targetId === 'budget') {
+                    initBudgetChart();
+                }
+            });
+        });
+
+        // 初始化預算圖表
+        function initBudgetChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '預算使用趨勢',
+                        data: [300000, 450000, 400000, 500000, 380000, 450000],
+                        borderColor: 'rgb(59, 130, 246)',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'NT$ ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 生成行事曆日期
+        function generateCalendar() {
+            const calendarDays = document.getElementById('calendar-days');
+            const events = {
+                5: { title: '部門會議', color: 'blue' },
+                12: { title: '客戶拜訪', color: 'green' },
+                15: { title: '專案討論', color: 'purple' },
+                20: { title: '季度報告', color: 'orange' }
+            };
+
+            // 清空現有內容
+            calendarDays.innerHTML = '';
+
+            // 生成日期格子
+            for (let i = 1; i <= 35; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `min-h-[120px] p-2 border-r border-b relative calendar-day ${i % 7 === 0 ? '' : 'border-r'}`;
+                
+                const dateDiv = document.createElement('div');
+                dateDiv.className = 'font-medium text-gray-600';
+                dateDiv.textContent = i;
+                dayDiv.appendChild(dateDiv);
+
+                if (events[i]) {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = `mt-1 p-1 text-xs text-white bg-${events[i].color}-500 rounded cursor-pointer hover:bg-${events[i].color}-600 transition-colors`;
+                    eventDiv.textContent = events[i].title;
+                    dayDiv.appendChild(eventDiv);
+                }
+
+                calendarDays.appendChild(dayDiv);
+            }
+        }
+
+        // 初始化行事曆
+        generateCalendar();
+
+        // 處理代辦事項的勾選效果
+        document.querySelectorAll('#todos input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const taskItem = this.closest('.task-item');
+                const taskText = taskItem.querySelector('span:not(.text-xs)');
+                
+                if (this.checked) {
+                    taskText.classList.add('line-through', 'text-gray-500');
+                    taskItem.classList.add('opacity-50');
+                } else {
+                    taskText.classList.remove('line-through', 'text-gray-500');
+                    taskItem.classList.remove('opacity-50');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
